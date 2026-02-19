@@ -4,6 +4,8 @@ Author : Christian Rhod
 Course : Numerical Scientific Computing 2026
 """
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 def mandelbrot_point(c, max_iter):
     z = 0
@@ -23,3 +25,30 @@ def compute_mandelbrot(xmin, xmax, ymin, ymax, width, height, max_iter):
             c = complex(x[j], y[i])
             mandelbrot_set[i, j] = mandelbrot_point(c, max_iter)
     return mandelbrot_set
+
+def view_mandelbrot(mandelbrot_set, xmin, xmax, ymin, ymax):
+    """
+    Made with AI
+    """
+    plt.imshow(mandelbrot_set, extent=(xmin, xmax, ymin, ymax), cmap='inferno')
+    plt.colorbar()
+    plt.title('Mandelbrot Set')
+    plt.xlabel('Re')
+    plt.ylabel('Im')
+    plt.show()
+
+    #save the image
+    plt.imsave('mandelbrot.png', mandelbrot_set, cmap='inferno')
+
+if __name__ == "__main__":
+    # Parameters for the Mandelbrot set
+    xmin, xmax, ymin, ymax = -2.0, 1.0, -1.5, 1.5
+    #width, height = 800, 600
+    width, height = 1024, 1024
+    max_iter = 100
+
+    # Compute the Mandelbrot set
+    mandelbrot_set = compute_mandelbrot(xmin, xmax, ymin, ymax, width, height, max_iter)
+
+    # Visualize the Mandelbrot set
+    view_mandelbrot(mandelbrot_set, xmin, xmax, ymin, ymax)
