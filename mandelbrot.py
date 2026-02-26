@@ -6,7 +6,7 @@ Course : Numerical Scientific Computing 2026
 import numpy as np
 import matplotlib.pyplot as plt
 import time , statistics
-from numba import njit
+from numba import njit, prange
 
 def benchmark(func, *args, n_runs=3):
     """ Time func, return median of n_runs. """
@@ -58,21 +58,21 @@ def mandelbrot_numpy( xmin , xmax , ymin , ymax , width , height , max_iter =100
             break
     return result
 
-@njit
-def mandelbrot_naive_numba( xmin , xmax , ymin , ymax , width , height , max_iter =100):
-    """ Fully JIT - compiled Mandelbrot --- structure identical to naive ."""
-    x = np . linspace ( xmin , xmax , width )
-    y = np . linspace ( ymin , ymax , height )
-    result = np . zeros (( height , width ) , dtype = np . int32 )
-    for i in range ( height ): # compiled loop
-        for j in range ( width ): # compiled loop
-            c = x [j] + 1j * y[ i]
-            z = 0j # complex literal : type inference works !
+@njit(parallel=True, fastmath=True)
+def mandelbrot_naive_numba(xmin, xmax, ymin, ymax, width, height, max_iter=100):
+    """ Fully JIT - compiled Mandelbrot with parallel outer loop."""
+    x = np.linspace(xmin, xmax, width)
+    y = np.linspace(ymin, ymax, height)
+    result = np.zeros((height, width), dtype=np.int32)
+    for i in prange(height):
+        for j in range(width):
+            c = x[j] + 1j * y[i]
+            z = 0j
             n = 0
-            while n < max_iter and (z. real * z. real + z. imag * z. imag ) <= 4.0:
-                z = z *z + c
+            while n < max_iter and (z.real * z.real + z.imag * z.imag) <= 4.0:
+                z = z * z + c
                 n += 1
-            result [i , j ] = n
+            result[i, j] = n
     return result
 
 @njit
