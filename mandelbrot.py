@@ -22,8 +22,8 @@ def benchmark(func, *args, n_runs=3):
     return median_t, result
     
 
-
-def mandelbrot_naive ( xmin , xmax , ymin , ymax , width , height , max_iter =100):
+@profile # Add this decorator
+def mandelbrot_naive( xmin , xmax , ymin , ymax , width , height , max_iter =100):
     x = np.linspace ( xmin , xmax , width )
     y = np.linspace ( ymin , ymax , height )
     result = np.zeros (( height , width ) , dtype = int )
@@ -40,7 +40,7 @@ def mandelbrot_naive ( xmin , xmax , ymin , ymax , width , height , max_iter =10
                 result [i , j ] = max_iter
     return result
 
-
+@profile # Add this decorator
 def mandelbrot_numpy ( xmin , xmax , ymin , ymax , width , height , max_iter =100):
     x = np.linspace(xmin, xmax, width)
     y = np.linspace(ymin, ymax, height)
@@ -57,7 +57,6 @@ def mandelbrot_numpy ( xmin , xmax , ymin , ymax , width , height , max_iter =10
         if not mask.any():
             break
     return result
-
 
 
 
