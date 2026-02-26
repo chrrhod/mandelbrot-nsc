@@ -120,6 +120,8 @@ class NumpyMandelbrot:
         self.view_mandelbrot(mandelbrot_set)
 
 
+
+
 if __name__ == "__main__":
     xmin, xmax, ymin, ymax = -2.0, 1.0, -1.5, 1.5
     width, height = 1024, 1024
