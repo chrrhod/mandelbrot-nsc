@@ -6,7 +6,7 @@ Course : Numerical Scientific Computing 2026
 import numpy as np
 import matplotlib.pyplot as plt
 import time , statistics
-
+from numba import njit
 
 def benchmark(func, *args, n_runs=3):
     """ Time func, return median of n_runs. """
@@ -22,7 +22,7 @@ def benchmark(func, *args, n_runs=3):
     return median_t, result
     
 
-@profile # Add this decorator
+#@profile
 def mandelbrot_naive( xmin , xmax , ymin , ymax , width , height , max_iter =100):
     x = np.linspace ( xmin , xmax , width )
     y = np.linspace ( ymin , ymax , height )
@@ -40,8 +40,8 @@ def mandelbrot_naive( xmin , xmax , ymin , ymax , width , height , max_iter =100
                 result [i , j ] = max_iter
     return result
 
-@profile # Add this decorator
-def mandelbrot_numpy ( xmin , xmax , ymin , ymax , width , height , max_iter =100):
+#@profile
+def mandelbrot_numpy( xmin , xmax , ymin , ymax , width , height , max_iter =100):
     x = np.linspace(xmin, xmax, width)
     y = np.linspace(ymin, ymax, height)
     X, Y = np.meshgrid(x, y)
@@ -58,7 +58,43 @@ def mandelbrot_numpy ( xmin , xmax , ymin , ymax , width , height , max_iter =10
             break
     return result
 
+@njit
+def mandelbrot_naive_numba( xmin , xmax , ymin , ymax , width , height , max_iter =100):
+    """ Fully JIT - compiled Mandelbrot --- structure identical to naive ."""
+    x = np . linspace ( xmin , xmax , width )
+    y = np . linspace ( ymin , ymax , height )
+    result = np . zeros (( height , width ) , dtype = np . int32 )
+    for i in range ( height ): # compiled loop
+        for j in range ( width ): # compiled loop
+            c = x [j] + 1j * y[ i]
+            z = 0j # complex literal : type inference works !
+            n = 0
+            while n < max_iter and (z. real * z. real + z. imag * z. imag ) <= 4.0:
+                z = z *z + c
+                n += 1
+            result [i , j ] = n
+    return result
 
+@njit
+def mandelbrot_point_numba(c, max_iter=100):
+    """ JIT - compiled Mandelbrot for a single point ."""
+    z = 0j
+    n = 0
+    while n < max_iter and (z. real * z. real + z. imag * z. imag ) <= 4.0:
+        z = z *z + c
+        n += 1
+    return n
+
+def mandelbrot_hybrid_numba( xmin , xmax , ymin , ymax , width , height , max_iter =100):
+    """ Hybrid approach : JIT - compile the point function only ."""
+    x = np . linspace ( xmin , xmax , width )
+    y = np . linspace ( ymin , ymax , height )
+    result = np . zeros (( height , width ) , dtype = np . int32 )
+    for i in range ( height ):
+        for j in range ( width ):
+            c = x [j] + 1j * y[ i]
+            result [i , j ] = mandelbrot_point_numba(c, max_iter)
+    return result
 
 
 
@@ -69,6 +105,9 @@ if __name__ == "__main__":
 
     run_naive = True
     run_numpy = True
+    run_naive_numba = True
+    run_hybrid_numba = True
+    run_numpy_numba = True
 
     times = {}
     results = {}
@@ -82,6 +121,20 @@ if __name__ == "__main__":
         numpy_t, numpy_M = benchmark(mandelbrot_numpy, xmin, xmax, ymin, ymax, width, height, max_iter)
         times["Numpy"] = numpy_t
         results["Numpy"] = numpy_M
+    
+    if run_naive_numba:
+        _ = mandelbrot_naive_numba(xmin, xmax, ymin, ymax, width, height, max_iter)  # Warm-up
+        naive_numba_t, naive_numba_M = benchmark(mandelbrot_naive_numba, xmin, xmax, ymin, ymax, width, height, max_iter)
+        times["Naive Numba"] = naive_numba_t
+        results["Naive Numba"] = naive_numba_M
+    
+    if run_hybrid_numba:
+        _ = mandelbrot_hybrid_numba(xmin, xmax, ymin, ymax, width, height, max_iter)  # Warm-up
+        hybrid_numba_t, hybrid_numba_M = benchmark(mandelbrot_hybrid_numba, xmin, xmax, ymin, ymax, width, height, max_iter)
+        times["Hybrid Numba"] = hybrid_numba_t
+        results["Hybrid Numba"] = hybrid_numba_M
+
+
 
     print("\nPerformance gains:")
     for method, t in times.items():
