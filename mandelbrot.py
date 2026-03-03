@@ -5,11 +5,11 @@ Course : Numerical Scientific Computing 2026
 """
 import numpy as np
 import matplotlib.pyplot as plt
-import time , statistics
+import time, statistics
 from numba import njit, prange
 
-def benchmark(func, *args, n_runs=3):
-    """ Time func, return median of n_runs. """
+def benchmark(func, *args, n_runs=15):
+    """Time func, return median of n_runs."""
     times = []
     for _ in range(n_runs):
         t0 = time.perf_counter()
@@ -23,25 +23,25 @@ def benchmark(func, *args, n_runs=3):
     
 
 #@profile
-def mandelbrot_naive( xmin , xmax , ymin , ymax , width , height , max_iter =100):
-    x = np.linspace ( xmin , xmax , width )
-    y = np.linspace ( ymin , ymax , height )
-    result = np.zeros (( height , width ) , dtype = int )
-    for i in range ( height ):
-        for j in range ( width ):
-            c = x [j] + 1j * y[ i]
+def mandelbrot_naive(xmin, xmax, ymin, ymax, width, height, max_iter =100):
+    x = np.linspace(xmin, xmax, width)
+    y = np.linspace(ymin, ymax, height)
+    result = np.zeros((height, width), dtype = int)
+    for i in range(height):
+        for j in range(width):
+            c = x [j] + 1j * y[i]
             z = 0
-            for n in range ( max_iter ):
+            for n in range (max_iter):
                 z = z *z + c
                 if abs (z) > 2:
-                    result [i , j] = n
+                    result[i, j] = n
                     break
             else:
-                result [i , j ] = max_iter
+                result[i, j ] = max_iter
     return result
 
 #@profile
-def mandelbrot_numpy( xmin , xmax , ymin , ymax , width , height , max_iter =100):
+def mandelbrot_numpy(xmin, xmax, ymin, ymax, width, height, max_iter =100):
     x = np.linspace(xmin, xmax, width)
     y = np.linspace(ymin, ymax, height)
     X, Y = np.meshgrid(x, y)
@@ -58,11 +58,10 @@ def mandelbrot_numpy( xmin , xmax , ymin , ymax , width , height , max_iter =100
             break
     return result
 
-@njit(parallel=True, fastmath=True)
-def mandelbrot_naive_numba(xmin, xmax, ymin, ymax, width, height, max_iter=100):
-    """ Fully JIT - compiled Mandelbrot with parallel outer loop."""
-    x = np.linspace(xmin, xmax, width)
-    y = np.linspace(ymin, ymax, height)
+@njit#(parallel=True, fastmath=True)
+def mandelbrot_naive_numba(xmin, xmax, ymin, ymax, width, height, max_iter=100, t = np.float32):
+    x = np.linspace(xmin, xmax, width).astype(t)
+    y = np.linspace(ymin, ymax, height).astype(t)
     result = np.zeros((height, width), dtype=np.int32)
     for i in prange(height):
         for j in range(width):
@@ -77,23 +76,23 @@ def mandelbrot_naive_numba(xmin, xmax, ymin, ymax, width, height, max_iter=100):
 
 @njit
 def mandelbrot_point_numba(c, max_iter=100):
-    """ JIT - compiled Mandelbrot for a single point ."""
+    """JIT - compiled Mandelbrot for a single point."""
     z = 0j
     n = 0
-    while n < max_iter and (z. real * z. real + z. imag * z. imag ) <= 4.0:
+    while n < max_iter and (z.real * z.real + z.imag * z.imag) <= 4.0:
         z = z *z + c
         n += 1
     return n
 
-def mandelbrot_hybrid_numba( xmin , xmax , ymin , ymax , width , height , max_iter =100):
-    """ Hybrid approach : JIT - compile the point function only ."""
-    x = np . linspace ( xmin , xmax , width )
-    y = np . linspace ( ymin , ymax , height )
-    result = np . zeros (( height , width ) , dtype = np . int32 )
-    for i in range ( height ):
-        for j in range ( width ):
+def mandelbrot_hybrid_numba(xmin, xmax, ymin, ymax, width, height, max_iter =100, t = np.float32):
+    """Hybrid approach : JIT - compile the point function only."""
+    x = np.linspace (xmin, xmax, width).astype(t)
+    y = np.linspace (ymin, ymax, height).astype(t)
+    result = np.zeros ((height, width), dtype = np.int32)
+    for i in range (height):
+        for j in range (width):
             c = x [j] + 1j * y[ i]
-            result [i , j ] = mandelbrot_point_numba(c, max_iter)
+            result [i, j ] = mandelbrot_point_numba(c, max_iter)
     return result
 
 
@@ -111,7 +110,7 @@ if __name__ == "__main__":
 
     times = {}
     results = {}
-
+    dtypes = [np.float32, np.float64]
     if run_naive:
         naive_t, naive_M = benchmark(mandelbrot_naive, xmin, xmax, ymin, ymax, width, height, max_iter)
         times["Naive"] = naive_t
@@ -123,16 +122,18 @@ if __name__ == "__main__":
         results["Numpy"] = numpy_M
     
     if run_naive_numba:
-        _ = mandelbrot_naive_numba(xmin, xmax, ymin, ymax, width, height, max_iter)  # Warm-up
-        naive_numba_t, naive_numba_M = benchmark(mandelbrot_naive_numba, xmin, xmax, ymin, ymax, width, height, max_iter)
-        times["Naive Numba"] = naive_numba_t
-        results["Naive Numba"] = naive_numba_M
+        _ = mandelbrot_naive_numba(xmin, xmax, ymin, ymax, width, height, max_iter)# Warm-up
+        for t in dtypes:
+            naive_numba_t, naive_numba_M = benchmark(mandelbrot_naive_numba, xmin, xmax, ymin, ymax, width, height, max_iter, t)
+            times[f"Naive Numba {t}"] = naive_numba_t
+            results[f"Naive Numba {t}"] = naive_numba_M
     
     if run_hybrid_numba:
-        _ = mandelbrot_hybrid_numba(xmin, xmax, ymin, ymax, width, height, max_iter)  # Warm-up
-        hybrid_numba_t, hybrid_numba_M = benchmark(mandelbrot_hybrid_numba, xmin, xmax, ymin, ymax, width, height, max_iter)
-        times["Hybrid Numba"] = hybrid_numba_t
-        results["Hybrid Numba"] = hybrid_numba_M
+        _ = mandelbrot_hybrid_numba(xmin, xmax, ymin, ymax, width, height, max_iter)# Warm-up
+        for t in dtypes:
+            hybrid_numba_t, hybrid_numba_M = benchmark(mandelbrot_hybrid_numba, xmin, xmax, ymin, ymax, width, height, max_iter, t)
+            times[f"Hybrid Numba {t}"] = hybrid_numba_t
+            results[f"Hybrid Numba {t}"] = hybrid_numba_M
 
 
 
@@ -149,13 +150,13 @@ if __name__ == "__main__":
     #check if the results are the same
     if run_naive and run_numpy:
         if np.allclose (results["Naive"], results["Numpy"]):
-            print (" Results match !")
+            print ("Results match!")
         else:
-            print (" Results differ !")
+            print ("Results differ!")
     
     # Check where they differ :
-    diff = np .abs ( results["Naive"] - results["Numpy"] )
-    print (f" Max difference : { diff.max ()}")
-    print (f" Different pixels : {( diff > 0). sum ()}")
+    diff = np.abs (results["Naive"] - results["Numpy"])
+    print (f"Max difference : { diff.max ()}")
+    print (f"Different pixels : {(diff > 0). sum ()}")
 
 
