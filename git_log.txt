@@ -1,0 +1,90 @@
+2026-03-03 83d61df Made the MP1 in a jupyter notebook. Editted the layout of the mandelbrot.py. Made sure the env.yml is up to date.
+
+ .gitignore                             |   3 +-
+ MP1.ipynb                              | 572 +++++++++++++++++++++++++++++++++
+ __pycache__/mandelbrot.cpython-311.pyc | Bin 4976 -> 8563 bytes
+ env.yml                                |  29 ++
+ hybrid_numba_f32_profile.prof          | Bin 0 -> 2603 bytes
+ hybrid_numba_f64_profile.prof          | Bin 0 -> 2603 bytes
+ mandelbrot.py                          |  87 ++---
+ naive_numba_f32_profile.prof           | Bin 0 -> 3879 bytes
+ naive_numba_f64_profile.prof           | Bin 0 -> 3879 bytes
+ naive_profile.prof                     | Bin 2569 -> 2569 bytes
+ numpy_profile.prof                     | Bin 6224 -> 6224 bytes
+ 11 files changed, 647 insertions(+), 44 deletions(-)
+2026-02-26 2830479 Added parallel execution
+
+ mandelbrot.py | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+2026-02-26 d332e8f Implemented numba version of mandelbrot and benchmarked them
+
+ mandelbrot.py   |  61 +++++++++++++++++++++++--
+ profiling.ipynb | 137 +++++++++++++++++++++++++++++++++++++++-----------------
+ 2 files changed, 154 insertions(+), 44 deletions(-)
+2026-02-26 70516f9 Ran the line_profiler and added the output to the profiling notebook
+
+ __pycache__/mandelbrot.cpython-311.pyc | Bin 8454 -> 4976 bytes
+ mandelbrot.py                          |   7 +++----
+ mandelbrot.py.lprof                    | Bin 0 -> 508 bytes
+ naive_profile.prof                     | Bin 2680 -> 2569 bytes
+ numpy_profile.prof                     | Bin 5455 -> 6224 bytes
+ profiling.ipynb                        |  31 +++++++++++++++++++------------
+ 6 files changed, 22 insertions(+), 16 deletions(-)
+2026-02-26 c680830 Removed the mandelbrot classes and rewrote them to a single function to make it easier in the following milestones
+
+ mandelbrot.py | 148 +++++++++++++++++-----------------------------------------
+ 1 file changed, 42 insertions(+), 106 deletions(-)
+2026-02-26 4dc98ba Made the profiling be printed seperatly
+
+ profiling.ipynb | 152 +++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 80 insertions(+), 72 deletions(-)
+2026-02-26 c019c55 Added a profiling jupyter notebook
+
+ __pycache__/mandelbrot.cpython-311.pyc | Bin 0 -> 8454 bytes
+ mandelbrot.py                          |   2 +
+ naive_profile.prof                     | Bin 0 -> 2680 bytes
+ numpy_profile.prof                     | Bin 0 -> 5455 bytes
+ profiling.ipynb                        | 142 +++++++++++++++++++++++++++++++++
+ 5 files changed, 144 insertions(+)
+2026-02-19 8c48f2e Added the vectorised version aswell as the benchmark given and the validation between the two versions
+
+ mandelbrot.py | 201 ++++++++++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 154 insertions(+), 47 deletions(-)
+2026-02-19 fec6532 Added a function to time other functions
+
+ mandelbrot.py | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+2026-02-19 42b3b01 Add visualization and save PNG for Mandelbrot
+
+ mandelbrot.png | Bin 0 -> 169762 bytes
+ mandelbrot.py  |  29 +++++++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+)
+2026-02-19 1341d82 Added compute_mandelbrot function
+
+ .gitignore    |  1 +
+ mandelbrot.py | 12 ++++++++++++
+ 2 files changed, 13 insertions(+)
+2026-02-19 f461eea Created mandelbrot_point function
+
+ mandelbrot.py | 21 ++++++++-------------
+ 1 file changed, 8 insertions(+), 13 deletions(-)
+2026-02-05 0590d00 Added my name
+
+ mandelbrot.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+2026-02-05 78b5e59 Added correct indentation
+
+ mandelbrot.py | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+2026-02-05 a8cedcf Added mandelbrot skeleton
+
+ mandelbrot.py | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+2026-02-05 49dce7d Added mandelbrot skeleton
+
+ mandelbrot.py | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+2026-02-05 ff20164 Added Python environment specification
+
+ env.yml | 159 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 159 insertions(+)
