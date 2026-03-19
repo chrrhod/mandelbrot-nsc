@@ -85,6 +85,13 @@ def mandelbrot_serial(N, x_min, x_max, y_min, y_max, max_iter=100):
     return mandelbrot_chunk(0, N, N, x_min, x_max, y_min, y_max, max_iter)
 
 
+def visualize(result):
+    plt.imshow(result, extent=(-2, 1, -1.5, 1.5), cmap='inferno')
+    plt.colorbar()
+    plt.title('Mandelbrot Set')
+    plt.xlabel('Re')
+    plt.ylabel('Im')
+    plt.show()
 
 
 
@@ -93,8 +100,8 @@ if __name__ == "__main__":
     width, height = 1024, 1024
     max_iter = 100
 
-    run_naive = True
-    run_numpy = True
+    run_naive = False
+    run_numpy = False
     run_serial_numba = True
     
     
@@ -113,7 +120,8 @@ if __name__ == "__main__":
         results["Numpy"] = numpy_M
     
     if run_serial_numba:
-        mandelbrot_serial(width, xmin, xmax, ymin, ymax, max_iter)
+        serial_result = mandelbrot_serial(width, xmin, xmax, ymin, ymax, max_iter)
+        visualize(serial_result)
         numba_t, numba_M = benchmark(mandelbrot_serial, width, xmin, xmax, ymin, ymax, max_iter)
         times["Numba"] = numba_t
         results["Numba"] = numba_M
