@@ -58,42 +58,33 @@ def mandelbrot_numpy(xmin, xmax, ymin, ymax, width, height, max_iter =100):
             break
     return result
 
-@njit#(parallel=True, fastmath=True)
-def mandelbrot_naive_numba(xmin, xmax, ymin, ymax, width, height, max_iter=100, t = np.float32):
-    x = np.linspace(xmin, xmax, width).astype(t)
-    y = np.linspace(ymin, ymax, height).astype(t)
-    result = np.zeros((height, width), dtype=np.int32)
-    for i in prange(height):
-        for j in range(width):
-            c = x[j] + 1j * y[i]
-            z = 0j
-            n = 0
-            while n < max_iter and (z.real * z.real + z.imag * z.imag) <= 4.0:
-                z = z * z + c
-                n += 1
-            result[i, j] = n
-    return result
 
 @njit
-def mandelbrot_point_numba(c, max_iter=100):
-    """JIT - compiled Mandelbrot for a single point."""
-    z = 0j
-    n = 0
-    while n < max_iter and (z.real * z.real + z.imag * z.imag) <= 4.0:
-        z = z *z + c
-        n += 1
-    return n
+def mandelbrot_pixel(c_real, c_imag, max_iter=100):
+    z_real, z_imag = 0.0, 0.0
+    for i in range(max_iter):
+        zr2 = z_real * z_real
+        zi2 = z_imag * z_imag
+        if zr2 + zi2 > 4.0: return i
+        z_imag = 2.0 * z_real * z_imag + c_imag
+        z_real = zr2 - zi2 + c_real
+    return max_iter
 
-def mandelbrot_hybrid_numba(xmin, xmax, ymin, ymax, width, height, max_iter =100, t = np.float32):
-    """Hybrid approach : JIT - compile the point function only."""
-    x = np.linspace (xmin, xmax, width).astype(t)
-    y = np.linspace (ymin, ymax, height).astype(t)
-    result = np.zeros ((height, width), dtype = np.int32)
-    for i in range (height):
-        for j in range (width):
-            c = x [j] + 1j * y[ i]
-            result [i, j ] = mandelbrot_point_numba(c, max_iter)
-    return result
+@njit
+def mandelbrot_chunk(row_start, row_end, N, x_min, x_max, y_min, y_max, max_iter):
+    out = np.empty((row_end - row_start, N), dtype=np.int32)
+    dx = (x_max - x_min) / N
+    dy = (y_max - y_min) / N
+    for r in range(row_end - row_start):
+        c_imag = y_min + (r + row_start) * dy
+        for col in range(N):
+            out[r, col] = mandelbrot_pixel(x_min + col*dx, c_imag, max_iter)
+    return out
+
+def mandelbrot_serial(N, x_min, x_max, y_min, y_max, max_iter=100):
+    return mandelbrot_chunk(0, N, N, x_min, x_max, y_min, y_max, max_iter)
+
+
 
 
 
@@ -104,9 +95,9 @@ if __name__ == "__main__":
 
     run_naive = True
     run_numpy = True
-    run_naive_numba = True
-    run_hybrid_numba = True
-    run_numpy_numba = True
+    run_serial_numba = True
+    
+    
 
     times = {}
     results = {}
@@ -121,19 +112,12 @@ if __name__ == "__main__":
         times["Numpy"] = numpy_t
         results["Numpy"] = numpy_M
     
-    if run_naive_numba:
-        _ = mandelbrot_naive_numba(xmin, xmax, ymin, ymax, width, height, max_iter)# Warm-up
-        for t in dtypes:
-            naive_numba_t, naive_numba_M = benchmark(mandelbrot_naive_numba, xmin, xmax, ymin, ymax, width, height, max_iter, t)
-            times[f"Naive Numba {t}"] = naive_numba_t
-            results[f"Naive Numba {t}"] = naive_numba_M
+    if run_serial_numba:
+        mandelbrot_serial(width, xmin, xmax, ymin, ymax, max_iter)
+        numba_t, numba_M = benchmark(mandelbrot_serial, width, xmin, xmax, ymin, ymax, max_iter)
+        times["Numba"] = numba_t
+        results["Numba"] = numba_M
     
-    if run_hybrid_numba:
-        _ = mandelbrot_hybrid_numba(xmin, xmax, ymin, ymax, width, height, max_iter)# Warm-up
-        for t in dtypes:
-            hybrid_numba_t, hybrid_numba_M = benchmark(mandelbrot_hybrid_numba, xmin, xmax, ymin, ymax, width, height, max_iter, t)
-            times[f"Hybrid Numba {t}"] = hybrid_numba_t
-            results[f"Hybrid Numba {t}"] = hybrid_numba_M
 
 
 
