@@ -137,8 +137,8 @@ if __name__ == "__main__":
     CHUNK_VALUES = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
 
     # ── One cluster for all measurements ─────────────────────────────────────
-    cluster = LocalCluster(n_workers=8, threads_per_worker=1)
-    client  = Client(cluster)
+    client = Client("tcp://10.92.1.232:8786") #10.92.1.232:8786
+
     print(f"Dashboard: {client.dashboard_link}")
 
     # ── Warm up Numba JIT on every worker ────────────────────────────────────
@@ -149,7 +149,6 @@ if __name__ == "__main__":
     results = sweep(client, N, X_MIN, X_MAX, Y_MIN, Y_MAX, MAX_ITER, CHUNK_VALUES)
 
     client.close()
-    cluster.close()
 
     # ── Summary ───────────────────────────────────────────────────────────────
     best = min(results, key=lambda r: r["t"])
