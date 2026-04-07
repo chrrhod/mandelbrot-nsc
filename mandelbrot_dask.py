@@ -8,7 +8,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from numba import njit
-
+from mandelbrot import mandelbrot_serial, benchmark
 
 @njit(cache=True)
 def mandelbrot_chunk_opt(row_start, row_end, N, x_min, x_max, y_min, y_max, max_iter):
@@ -128,7 +128,7 @@ def plot_sweep(results, out_path="dask_chunk_sweep.png"):
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    N        = 1024
+    N        = 8192
     MAX_ITER = 100
     X_MIN, X_MAX = -2.5, 1.0
     Y_MIN, Y_MAX = -1.25, 1.25
@@ -139,22 +139,43 @@ if __name__ == "__main__":
     # ── One cluster for all measurements ─────────────────────────────────────
     client = Client("tcp://10.92.1.232:8786") #10.92.1.232:8786
 
+    #cluster = LocalCluster(n_workers=8, threads_per_worker=1)
+    #client = Client(cluster)
+
     print(f"Dashboard: {client.dashboard_link}")
+
+    #numberOfWorkers = len(client.nthreads())
 
     # ── Warm up Numba JIT on every worker ────────────────────────────────────
     client.run(lambda: mandelbrot_chunk_opt(0, 8, 8, X_MIN, X_MAX, Y_MIN, Y_MAX, 10))
-    print("Numba JIT warmed up on all workers.\n")
+    print(f"Numba JIT warmed up on all {len(client.nthreads())} workers.\n")
 
     # ── Sweep ─────────────────────────────────────────────────────────────────
     results = sweep(client, N, X_MIN, X_MAX, Y_MIN, Y_MAX, MAX_ITER, CHUNK_VALUES)
 
     client.close()
+    #cluster.close()
 
     # ── Summary ───────────────────────────────────────────────────────────────
     best = min(results, key=lambda r: r["t"])
     print(f"\n  n_chunks optimal : {best['n_chunks']}")
     print(f"  t_min            : {best['t']:.3f} s")
     print(f"  LIF at optimum   : {best['lif']:.3f}")
+
+    #Run the benchmark on the serial version to get the reference time
+    
+    mandelbrot_serial(N, X_MIN, X_MAX, Y_MIN, Y_MAX, MAX_ITER) # warm-up
+    serial_times = []
+    for _ in range(3):
+        t0 = time.perf_counter()
+        mandelbrot_serial(N, X_MIN, X_MAX, Y_MIN, Y_MAX, MAX_ITER)
+        serial_times.append(time.perf_counter() - t0)
+    serial_time = statistics.median(serial_times)
+
+    print(f"\n  Serial reference time: {serial_time:.3f} s")
+
+
+
 
     # ── Plot ──────────────────────────────────────────────────────────────────
     plot_sweep(results, out_path="dask_chunk_sweep.png")
