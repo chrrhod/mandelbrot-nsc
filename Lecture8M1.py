@@ -1,9 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from mandelbrot import mandelbrot_serial
 
 N, MAX_ITER, TAU = 512, 1000, 0.01
-x = np.linspace(-0.7530, -0.7490, N)
-y = np.linspace( 0.0990, 0.1030, N)
+x_min = -0.7530
+x_max = -0.7490
+y_min = 0.0990
+y_max = 0.1030
+x = np.linspace(x_min, x_max, N)
+y = np.linspace(y_min, y_max, N)
 
 C64 = (x[np.newaxis, :] + 1j * y[:, np.newaxis]).astype(np.complex128)
 C32 = C64.astype(np.complex64)
@@ -25,9 +30,35 @@ for k in range(MAX_ITER):
     diverge[newly] = k
     active[newly] = False
 
-plt.imshow(diverge, cmap='plasma', origin='lower',
-           extent=[-0.7530, -0.7490, 0.0990, 0.1030])
-plt.colorbar(label='First divergence iteration')
-plt.title(f'Trajectory divergence (tau={TAU})')
+
+mandelbrot_image = mandelbrot_serial(N, x_min, x_max, y_min, y_max, max_iter=1000)
+
+
+
+number_of_max_iter = np.sum(diverge == MAX_ITER)
+print(f'Number of points that did not diverge within {MAX_ITER} iterations: {number_of_max_iter}')
+
+
+
+earliest_divergence = np.unravel_index(np.argmin(diverge), diverge.shape)
+print(f'Earliest divergence at index: {earliest_divergence}, C = {C64[earliest_divergence]}')
+
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 5), constrained_layout=True)
+
+im0 = ax[0].imshow(diverge, cmap='plasma', origin='lower',
+                   extent=[x_min, x_max, y_min, y_max])
+fig.colorbar(im0, ax=ax[0], label='First divergence iteration')
+ax[0].set_title(f'Trajectory divergence (tau={TAU})')
+
+im1 = ax[1].imshow(mandelbrot_image, cmap='inferno', origin='lower',
+                   extent=[x_min, x_max, y_min, y_max])
+fig.colorbar(im1, ax=ax[1], label='Escape iteration')
+ax[1].set_title('Mandelbrot escape map')
+
+for a in ax:
+    a.set_xlabel('Re(c)')
+    a.set_ylabel('Im(c)')
+
 plt.savefig('mp3_m1_output.png', dpi=150)
 plt.show()
