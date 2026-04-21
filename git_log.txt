@@ -1,3 +1,46 @@
+2026-04-07 5082e2a Finished MP2
+
+ MP2.ipynb | 183 ++++++++++++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 155 insertions(+), 28 deletions(-)
+2026-04-07 552522e Starting adding text ot the MP2 aswell as making the mandelbrot_dask file print more data
+
+ MP2.ipynb            | 129 ++++++++++++++++++++++++++++++++++++++++++++-------
+ dask_chunk_sweep.png | Bin 96435 -> 97916 bytes
+ mandelbrot_dask.py   |  27 +++++++++--
+ 3 files changed, 136 insertions(+), 20 deletions(-)
+2026-04-07 cb36519 Changed the lines to make it work on Strato
+
+ MP2.ipynb          | 2 +-
+ mandelbrot_dask.py | 5 ++---
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+2026-03-19 f61ffb3 Rewrote dask to do sweep
+
+ MP2.ipynb            |  60 +++++++++++++++++++-
+ dask_chunk_sweep.png | Bin 0 -> 96435 bytes
+ mandelbrot_dask.py   | 153 ++++++++++++++++++++++++++++++++++++++++++++++-----
+ 3 files changed, 197 insertions(+), 16 deletions(-)
+2026-03-19 b4ba59a Added dask on local machine
+
+ __pycache__/mandelbrot.cpython-311.pyc | Bin 8563 -> 10106 bytes
+ mandelbrot_dask.py                     |  38 +++++++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+)
+2026-03-19 69d7478 Added parallel numba and started adding stuff to MP2
+
+ MP2.ipynb     | 143 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ mandelbrot.py |  75 +++++++++++++++++++++++++-----
+ 2 files changed, 206 insertions(+), 12 deletions(-)
+2026-03-19 708639a added visualization
+
+ mandelbrot.py | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+2026-03-19 727c1b9 refactored numba code into the three functions
+
+ mandelbrot.py | 82 ++++++++++++++++++++++++-----------------------------------
+ 1 file changed, 33 insertions(+), 49 deletions(-)
+2026-03-03 bbb1c6a Made the git_log.txt
+
+ git_log.txt | 90 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 90 insertions(+)
 2026-03-03 83d61df Made the MP1 in a jupyter notebook. Editted the layout of the mandelbrot.py. Made sure the env.yml is up to date.
 
  .gitignore                             |   3 +-
