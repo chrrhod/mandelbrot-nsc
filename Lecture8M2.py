@@ -31,6 +31,23 @@ cmap_k.set_bad('0.25')
 
 vmax = np.nanpercentile(kappa, 99)
 
+
+#print where kappa is largest
+max_idx = np.unravel_index(np.nanargmax(kappa), kappa.shape)
+print(f'Max kappa at index {max_idx}, C = {C[max_idx]}, kappa = {kappa[max_idx]:.2e}')
+
+
+interior = (n_base == MAX_ITER)
+print("Interior pixel count:", interior.sum())
+if interior.any():
+    vals = kappa[interior]
+    print("kappa interior: min =", np.nanmin(vals),
+          "max =", np.nanmax(vals),
+          "mean =", np.nanmean(vals))
+else:
+    print("No interior pixels in this window.")
+
+
 plt.imshow(kappa, cmap=cmap_k, origin='lower',
            extent=[-0.7530, -0.7490, 0.0990, 0.1030],
            norm=LogNorm(vmin=1, vmax=vmax))
