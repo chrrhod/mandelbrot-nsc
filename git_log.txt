@@ -1,3 +1,52 @@
+2026-04-29 c82ecef Added comment on GPU, aswell as titles for sections
+
+ MP3.ipynb | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+2026-04-22 2265028 Ran Lecture 10 and added them to the MP3
+
+ MP3.ipynb                                          |  85 ++++++++
+ .../basic_test.py                                  |  80 +++++++
+ .../buddhabrot_simple.png                          | Bin 0 -> 875614 bytes
+ .../buddhabrot_simple_opencl.py                    | 175 ++++++++++++++++
+ .../introspection.py                               |  27 +++
+ .../iteration_histogram.png                        | Bin 0 -> 52795 bytes
+ .../iteration_histogram_image.png                  | Bin 0 -> 102819 bytes
+ .../iteration_histogram_opencl.py                  | 169 +++++++++++++++
+ .../mandelbrot_opencl.py                           | 193 +++++++++++++++++
+ .../mandelbrot_variants.png                        | Bin 0 -> 681171 bytes
+ .../mandelbrot_variants_opencl.py                  | 232 +++++++++++++++++++++
+ .../opencl_template.py                             |  99 +++++++++
+ .../workgroup_sweep.png                            | Bin 0 -> 60246 bytes
+ .../workgroup_sweep_opencl.py                      | 163 +++++++++++++++
+ mandelbrot_gpu.png                                 | Bin 0 -> 71863 bytes
+ mandelbrot_opencl.png                              | Bin 0 -> 118115 bytes
+ mandelbrot_opencl.py                               |   0
+ 17 files changed, 1223 insertions(+)
+2026-04-21 ce0e024 Made the test script and added the results to the MP3
+
+ .coverage          | Bin 0 -> 53248 bytes
+ MP3.ipynb          |  84 +++++++++++++++++++++++++++++++++++++++++++-
+ test_mandelbrot.py | 100 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 183 insertions(+), 1 deletion(-)
+2026-04-21 1694435 Added observations from M2 to MP3
+
+ Lecture8M2.py | 17 +++++++++++++++++
+ MP3.ipynb     | 15 ++++++++++++---
+ 2 files changed, 29 insertions(+), 3 deletions(-)
+2026-04-21 3fc9e42 Added observation from M1 to MP3
+
+ Lecture8M1.py     |  43 ++++++++++++++++++++++++++++++-----
+ MP3.ipynb         |  66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ mp3_m1_output.png | Bin 114997 -> 175108 bytes
+ 3 files changed, 103 insertions(+), 6 deletions(-)
+2026-04-21 d0d34b9 Added Lecture8 M1 and M2
+
+ Lecture8M1.py     |  33 +++++++++++++++++++++++++++++++++
+ Lecture8M2.py     |  40 ++++++++++++++++++++++++++++++++++++++++
+ git_log.txt       |  43 +++++++++++++++++++++++++++++++++++++++++++
+ mp3_m1_output.png | Bin 0 -> 114997 bytes
+ mp3_m2_output.png | Bin 0 -> 72986 bytes
+ 5 files changed, 116 insertions(+)
 2026-04-07 5082e2a Finished MP2
 
  MP2.ipynb | 183 ++++++++++++++++++++++++++++++++++++++++++++++++++++----------
